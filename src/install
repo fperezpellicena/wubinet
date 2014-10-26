@@ -1,0 +1,5 @@
+1.- Install RXTX in the system libraries
+2.- Add user running the java application to dialout group:
+
+		sudo adduser francisco dialout
+		sudo chmod a+rw /dev/ttyUSB0
