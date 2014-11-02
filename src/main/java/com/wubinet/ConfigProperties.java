@@ -30,4 +30,7 @@ public class ConfigProperties {
 		return Integer.parseInt(PROPERTIES.getProperty("xbee.baudrate"));
 	}
 
+	public static String serverEndpointUrl() {
+		return PROPERTIES.getProperty("server.endpointUrl");
+	}
 }

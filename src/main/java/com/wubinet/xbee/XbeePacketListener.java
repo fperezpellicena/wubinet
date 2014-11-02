@@ -1,20 +1,26 @@
 package com.wubinet.xbee;
 
 import com.rapplogic.xbee.api.PacketListener;
-import com.rapplogic.xbee.api.XBee;
 import com.rapplogic.xbee.api.XBeeResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.wubinet.ConfigProperties;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Listener thread for incoming packets.
  */
 public class XbeePacketListener implements PacketListener {
 
-	private static final Logger LOG = LoggerFactory.getLogger(XbeePacketListener.class);
+	// Rest template is thread safe
+	private static final RestTemplate REST_TEMPLATE = new RestTemplate();
+	private static final String URL = ConfigProperties.serverEndpointUrl();
+	// FIXME Set thread pool size in configuration
+	private final ExecutorService executorService = Executors.newFixedThreadPool(100);
 
 	@Override
 	public void processResponse(XBeeResponse response) {
-		LOG.debug("Packet received");
+		executorService.execute(new XbeePacketProcessor(response, URL, REST_TEMPLATE));
 	}
 }
