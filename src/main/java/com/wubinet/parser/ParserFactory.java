@@ -12,6 +12,10 @@ public class ParserFactory {
 				return IrcaParser.build(data);
 			case CO2D1:
 				return Co2D1Parser.build(data);
+			case INTEGRITY_SENSOR:
+				return IntegritySensorParser.build(data);
+			case MS5540B:
+				return Ms5540bParser.build(data);
 			default:
 				throw new UnsupportedOperationException("Sensor parser not implemented for " + sensorType);
 		}
