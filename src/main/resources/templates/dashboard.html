@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout">
+    <head lang="en">
+        <meta charset="UTF-8"/>
+        <title>Real time network data</title>
+        <!-- Plot stylesheets -->
+        <link rel="stylesheet" th:if="${node}" th:href="@{/css/plot.css}" />
+        <!-- Plot scripts -->
+        <script th:src="@{/js/plot.js}"></script>
+        <script th:src="@{/js/plotAxis.js}"></script>
+        <script th:src="@{/js/plotSvg.js}"></script>
+        <script th:src="@{/js/plotData.js}"></script>
+        <script th:src="@{/js/plotPath.js}"></script>
+        <script th:if="${node}"
+                th:inline="javascript">
+            $(document).ready(function(){
+                var address = /*[[${node.address}]]*/ "";
+                initPlot(address);
+            });
+
+            function saveSleepMode() {
+                var address = /*[[${node.address}]]*/ "";
+                var url = 'http://localhost:8080/wubinet/saveSleepMode';
+                var mode = $('#sleep-mode option:selected').attr('value');
+                var data = {
+                    address: address,
+                    mode: mode,
+                };
+                $.post(url, data, function(result) {
+                    toggleStatusModal(result.data);
+                });
+            }
+
+            function savePowerLevel() {
+                var address = /*[[${node.address}]]*/ "";
+                var url = 'http://localhost:8080/wubinet/savePowerLevel';
+                var level = $('#power-level option:selected').attr('value');
+                var data = {
+                    address: address,
+                    level: level,
+                };
+                $.post(url, data, function(result) {
+                    toggleStatusModal(result.data);
+                });
+            }
+        </script>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="main"></div>
+                </div>
+                <div class="col-md-4">
+                    <div th:if="${node}">
+                        <form class="form-inline" action="saveSleepMode" method="post" th:object="${configuration}">
+                            <h2>Sleep mode</h2>
+                            <select id="sleep-mode" class="form-control" th:field="*{sleepMode}">
+                                <option value="0">Normal</option>
+                                <option value="7">Sleep support</option>
+                                <option value="8">Cyclic sleep</option>
+                            </select>
+                            <a href="#" class="btn btn-default" onclick="saveSleepMode()">Set sleep mode</a>
+                        </form>
+                        <form class="form-inline" action="savePowerLevel" method="post" th:object="${configuration}">
+                            <h2>Power level</h2>
+                            <select id="power-level" class="form-control" th:field="*{powerLevel}">
+                                <option value="4">Maximum</option>
+                                <option value="3">High</option>
+                                <option value="2">Medium</option>
+                                <option value="1">Low</option>
+                                <option value="0">Minimum</option>
+                            </select>
+                            <a href="#" class="btn btn-default" onclick="savePowerLevel()">Set power level</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

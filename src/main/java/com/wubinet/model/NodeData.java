@@ -17,8 +17,6 @@ public class NodeData {
 
 	private String address;
 
-	private boolean mobile;
-
 	private Date timestamp = new Date();
 
 	private List<Measure> measures = new ArrayList<>();

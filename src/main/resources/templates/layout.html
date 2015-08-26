@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+    <head lang="en">
+        <meta charset="UTF-8"/>
+        <title>Wubinet</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" />
+        <link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+        <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+        <script>
+            function saveNodeAndExecuteCallback(address) {
+                localStorage.setItem('address', address);
+                selectNodeCallback();
+            }
+
+            function toggleStatusModal(status) {
+                if (status === 'ok') {
+                    $('.modal-body').text('AT command sent successfully!');
+                } else {
+                    $('.modal-body').text('Error sending AT command');
+                }
+                $('#statusModal').modal('show');
+            }
+        </script>
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                            aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" th:href="@{/}">Wubinet</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a th:href="@{/}">Dashboard</a></li>
+                        <li><a th:href="@{/historic}">Historic</a></li>
+                        <li><a th:href="@{/network-configuration}">Configuration</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-3 col-md-2 sidebar">
+                    <ul class="nav nav-sidebar">
+                        <li th:each="node, index : ${nodes}">
+                            <a th:href="@{/dashboard/__${node.address}__}"
+                                th:text="|Node - ${index.index}|">
+                                <em th:text="${node.address}">13A200...</em></a>
+                        </li>
+                    </ul>
+                </div>
+                <div layout:fragment="content"
+                     class="col-sm-6 col-sm-offset-3 col-md-10 col-md-offset-2"></div>
+            </div>
+        </div>
+        <div class="modal fade" id="statusModal" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">AT command</h4>
+                    </div>
+                    <div class="modal-body"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary">Ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

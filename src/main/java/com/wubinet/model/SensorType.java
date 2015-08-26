@@ -8,7 +8,10 @@ public enum SensorType {
 	SHT11('S', 4),
 	IRCA1('I', 6),
 	CO2D1('C', 2),
-	BMP085('B', 4);
+	BMP085('B', 4),
+	H25K5A('H', 2),
+	NTC('N', 2),
+	MS5540B('M', 14);
 
 	private final char id;
 	private final int dataLength;

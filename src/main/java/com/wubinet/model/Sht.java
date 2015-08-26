@@ -23,13 +23,13 @@ public class Sht implements Sensor {
 	private static final BigDecimal D1 = BigDecimal.valueOf(-39.6);
 	private static final BigDecimal D2 = BigDecimal.valueOf(0.01);
 
-	private final int temperature;
+	private final BigDecimal temperature;
 
-	private final int humidity;
+	private final BigDecimal humidity;
 
 	public Sht(int temperature, int humidity) {
-		this.temperature = temperature;
-		this.humidity = humidity;
+		this.temperature = BigDecimal.valueOf(temperature);
+		this.humidity = BigDecimal.valueOf(humidity);
 	}
 
 	@Override
@@ -41,24 +41,21 @@ public class Sht implements Sensor {
 	}
 
 	private BigDecimal calculateTemperature() {
-		BigDecimal temperatureBd = BigDecimal.valueOf(temperature);
-		return D1.add(D2.multiply(temperatureBd));
+		return D1.add(D2.multiply(temperature));
 	}
 
 	private BigDecimal calculateHumidity() {
 		BigDecimal temperature = calculateTemperature();
 		BigDecimal linearHumidity = calculateLinearHumidity();
-		BigDecimal humidityBd = BigDecimal.valueOf(humidity);
 		BigDecimal normalizedTemperature = temperature.subtract(TREF);
-		BigDecimal compensatedHumidity = T1.add(T2.multiply(humidityBd));
+		BigDecimal compensatedHumidity = T1.add(T2.multiply(humidity));
 		BigDecimal humidityValue = ((normalizedTemperature.multiply(compensatedHumidity).add(linearHumidity)));
 		return humidityValue.setScale(2, RoundingMode.HALF_UP);
 	}
 
 	private BigDecimal calculateLinearHumidity() {
-		BigDecimal humidityBd = BigDecimal.valueOf(humidity);
-		BigDecimal humiditySqrd = humidityBd.pow(2);
-		return C1.add(C2.multiply(humidityBd)).add(C3.multiply(humiditySqrd));
+		BigDecimal humiditySqrd = humidity.pow(2);
+		return C1.add(C2.multiply(humidity)).add(C3.multiply(humiditySqrd));
 	}
 
 	@Override

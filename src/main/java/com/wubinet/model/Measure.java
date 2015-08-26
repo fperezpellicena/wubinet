@@ -10,5 +10,14 @@ import java.util.Map;
 public class Measure {
 
 	private SensorType sensor;
+
 	private Map<MeasureType, Object> values;
+
+	public Object getMeasureTypeValue(MeasureType measureType) {
+		if (values != null) {
+			return values.get(measureType);
+		} else {
+			return null;
+		}
+	}
 }

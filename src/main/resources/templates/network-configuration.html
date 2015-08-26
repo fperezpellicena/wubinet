@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout">
+    <head lang="en">
+        <meta charset="UTF-8"/>
+        <title>Network configuration</title>
+        <link rel="stylesheet" th:href="@{/css/jquery-ui.min.css}" />
+        <link rel="stylesheet" th:href="@{/css/jquery-ui.theme.min.css}" />
+        <script th:src="@{/js/jquery-ui.min.js}"></script>
+        <script>
+        
+            function initSleepPeriodInputs() {
+                $("#millisSleepPeriod").spinner();
+                $("#secondsSleepPeriod").spinner();
+                $("#minutesSleepPeriod").spinner();
+                $("#hoursSleepPeriod").spinner();
+            }
+            
+            function initWakeTimeInputs() {
+                $("#millisWakeTime").spinner();
+                $("#secondsWakeTime").spinner();
+                $("#minutesWakeTime").spinner();
+                $("#hoursWakeTime").spinner();
+            }
+
+            function saveSleepPeriod() {
+                var url = 'http://localhost:8080/wubinet/saveSleepPeriod';
+                var data = {
+                    millisSleepPeriod: $('#millisSleepPeriod').attr('value'),
+                    secondsSleepPeriod: $('#secondsSleepPeriod').attr('value'),
+                    minutesSleepPeriod: $('#minutesSleepPeriod').attr('value'),
+                    hoursSleepPeriod: $('#hoursSleepPeriod').attr('value')
+                };
+                $.post(url, data, function(result) {
+                    toggleStatusModal(result.data);
+                });
+            }
+
+            function saveWakeTime() {
+                var url = 'http://localhost:8080/wubinet/saveWakeTime';
+                var data = {
+                    millisWakeTime: $('#millisWakeTime').attr('value'),
+                    secondsWakeTime: $('#secondsWakeTime').attr('value'),
+                    minutesWakeTime: $('#minutesWakeTime').attr('value')
+                };
+                $.post(url, data, function(result) {
+                    toggleStatusModal(result.data);
+                });
+            }
+
+            $(document).ready(function() {
+                initSleepPeriodInputs();
+                initWakeTimeInputs();
+            });
+        </script>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <h1>Configuration parameters</h1>
+            <div>
+                <h2>Sleep period</h2>
+                <form id="sleep-period-form" action="saveSleepPeriod" method="post">
+                    <div class="form-group">
+                        <input min="10" max="990" step="10" value="10" id="millisSleepPeriod" name="millisSleepPeriod" />
+                        <span>milliseconds</span>
+                    </div>
+                    <div class="form-group">
+                        <input min="0" max="59" step="1" value="0" id="secondsSleepPeriod" name="secondsSleepPeriod" />
+                        <span>seconds</span>
+                    </div>
+                    <div class="form-group">
+                        <input min="0" max="59" step="1" value="0" id="minutesSleepPeriod" name="minutesSleepPeriod" />
+                        <span>minutes</span>
+                    </div>
+                    <div class="form-group">
+                        <input min="0" max="3" step="1" value="0" id="hoursSleepPeriod" name="hoursSleepPeriod" />
+                        <span>hours</span>
+                    </div>
+                    <a href="#" class="btn btn-default" onclick="saveSleepPeriod()">Set sleep period</a>
+                </form>
+            </div>
+            <hr />
+            <div>
+                <h2>Wake time</h2>
+                <form id="wake-time-form" action="saveWakeTime" method="post">
+                    <div class="form-group">
+                        <div class="form-group">
+                            <input min="0" max="999" step="1" value="69" id="millisWakeTime" name="millisWakeTime" />
+                            <span>milliseconds</span>
+                        </div>
+                        <div class="form-group">
+                            <input min="0" max="59" step="1" value="0" id="secondsWakeTime" name="secondsWakeTime" />
+                            <span>seconds</span>
+                        </div>
+                        <div class="form-group">
+                            <input min="0" max="59" step="1" value="0" id="minutesWakeTime" name="minutesWakeTime" />
+                            <span id="minutesWakeTimeValue">minutes</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-default" onclick="saveWakeTime()">Set wake time</button>
+                </form>
+            </div>
+        </div>
+    </body>
+</html>

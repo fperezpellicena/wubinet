@@ -10,6 +10,8 @@ public class ParserFactory {
 				return ShtParser.build(data);
 			case IRCA1:
 				return IrcaParser.build(data);
+			case CO2D1:
+				return Co2D1Parser.build(data);
 			default:
 				throw new UnsupportedOperationException("Sensor parser not implemented for " + sensorType);
 		}

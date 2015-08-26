@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface NodeDataRepository extends MongoRepository<NodeData, String> {
 
-	List<NodeData> findByAddress(String address);
+	List<NodeData> findFirst50ByAddressOrderByTimestampDesc(String nodeAddress);
+
 }

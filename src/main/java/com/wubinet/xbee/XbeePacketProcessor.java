@@ -4,17 +4,13 @@ import com.rapplogic.xbee.api.ApiId;
 import com.rapplogic.xbee.api.XBeeAddress64;
 import com.rapplogic.xbee.api.XBeeResponse;
 import com.rapplogic.xbee.api.zigbee.ZNetRxResponse;
-import com.wubinet.dao.NodeDataRepository;
-import com.wubinet.model.Measure;
-import com.wubinet.model.MeasureType;
-import com.wubinet.model.NodeData;
-import com.wubinet.model.SensorType;
+import com.wubinet.model.*;
 import com.wubinet.parser.Parser;
+import com.wubinet.service.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -27,34 +23,39 @@ public class XbeePacketProcessor implements Runnable {
 	private static final Logger LOG = LoggerFactory.getLogger(XbeePacketProcessor.class);
 
 	private final XBeeResponse response;
-	private final NodeDataRepository repository;
+	private final NodeService nodeService;
 
-	public XbeePacketProcessor(XBeeResponse response, NodeDataRepository repository) {
+	public XbeePacketProcessor(XBeeResponse response, NodeService nodeService) {
 		this.response = response;
-		this.repository = repository;
+		this.nodeService = nodeService;
 	}
 
-	// int[] packet = {1, 2, 83, 73, 0x1A, 0x0A, 5, 0x4A, 2, 96, 2, 122, 3, 255};
 	@Override
 	public void run() {
 		ApiId apiId = response.getApiId();
 		if (ApiId.ZNET_RX_RESPONSE == apiId) {
 			ZNetRxResponse zNetRxResponse = (ZNetRxResponse) response;
 			int[] packet = zNetRxResponse.getData();
-			System.out.println(Arrays.toString(packet));
-//			int[] packet = {1, 2, 83, 73, 0x1A, 0x0A, 5, 0x4A, 2, 96, 2, 122, 3, 255};
 			XBeeAddress64 address = zNetRxResponse.getRemoteAddress64();
+			Node node = parseNodeData(packet, address);
 			NodeData nodeData = parsePacketData(packet, address);
-			LOG.info(nodeData.toString());
-			repository.save(nodeData);
+			nodeService.save(node, nodeData);
+			LOG.info("Packet received: " + node);
 		}
+		// TODO Parse ZNET_IO_NODE_IDENTIFIER_RESPONSE
+	}
+
+	private Node parseNodeData(int[] packet, XBeeAddress64 address) {
+		Node node = new Node();
+		node.setAddress(address.toString());
+		node.setMobile(parseMobile(packet));
+		return node;
 	}
 
 	private NodeData parsePacketData(int[] packet, XBeeAddress64 address) {
 		NodeData nodeData = new NodeData();
-		nodeData.setAddress(address.toString());
-		nodeData.setMobile(parseMobile(packet));
 		nodeData.setMeasures(parseMeasures(packet));
+		nodeData.setAddress(address.toString());
 		return nodeData;
 	}
 

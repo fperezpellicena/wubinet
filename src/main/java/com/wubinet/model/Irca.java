@@ -19,9 +19,7 @@ public class Irca implements Sensor {
 	private static final BigDecimal CALIBRATION_SPAN = BigDecimal.valueOf(0.51427);
 
 	// Valores de referencia en ausencia de CO2
-	private static final BigDecimal ACT0 = BigDecimal.valueOf(1.0333);
-	private static final BigDecimal REF0 = BigDecimal.valueOf(1.0633);
-	private static final BigDecimal ZERO = ACT0.divide(REF0);
+	private static final BigDecimal ZERO = BigDecimal.valueOf(0.97);
 
 	// Parámetros de cálculo
 	private static final BigDecimal B = BigDecimal.valueOf(0.520);
@@ -50,24 +48,25 @@ public class Irca implements Sensor {
 	}
 
 	private BigDecimal calculateAbsorbance() {
-		BigDecimal actRefRatio = active.divide(reference.multiply(ZERO));
+		BigDecimal divisor = reference.multiply(ZERO);
+		BigDecimal actRefRatio = active.divide(divisor, 2, RoundingMode.HALF_UP);
 		return ONE.subtract(actRefRatio);
 	}
 
 	private BigDecimal calculateConcentration() {
 		BigDecimal absorbance = calculateAbsorbance();
-		BigDecimal absortionSpanRatio = absorbance.divide(CALIBRATION_SPAN);
+		BigDecimal absorbanceSpanRatio = absorbance.divide(CALIBRATION_SPAN, 2, RoundingMode.HALF_UP);
 		BigDecimal numerator;
 		if (absorbance.signum() == 1) {
-			numerator = BigDecimal.valueOf(log(ONE.subtract(absortionSpanRatio).doubleValue()));
+			numerator = BigDecimal.valueOf(log(ONE.subtract(absorbanceSpanRatio).doubleValue()));
 		} else {
-			numerator = BigDecimal.valueOf(log(ONE.add(absortionSpanRatio).doubleValue()));
+			numerator = BigDecimal.valueOf(log(ONE.add(absorbanceSpanRatio).doubleValue()));
 		}
-		double base = numerator.divide(B.negate()).doubleValue();
-		double exponent = ONE.divide(C).doubleValue();
+		double base = numerator.divide(B.negate(), 2, RoundingMode.HALF_UP).doubleValue();
+		double exponent = ONE.divide(C, 2, RoundingMode.HALF_UP).doubleValue();
 		double concentration = Math.exp(exponent * Math.log(base));
 		BigDecimal concentrationPercentage = BigDecimal.valueOf(concentration);
-		if (absorbance.signum() == 1) {
+		if (absorbance.signum() == -1) {
 			concentrationPercentage = concentrationPercentage.negate();
 		}
 		return concentrationPercentage.setScale(2, RoundingMode.HALF_UP);
