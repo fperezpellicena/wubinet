@@ -41,8 +41,8 @@ public class Irca implements Sensor {
 	}
 
 	@Override
-	public Map<MeasureType, Object> calculate() {
-		Map<MeasureType, Object> measures = new HashMap();
+	public Map<MeasureType, BigDecimal> calculate() {
+		Map<MeasureType, BigDecimal> measures = new HashMap();
 		measures.put(MeasureType.CO2_PERCENTAGE, calculateConcentration());
 		return measures;
 	}

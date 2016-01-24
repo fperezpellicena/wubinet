@@ -1,57 +1,67 @@
 package com.wubinet.web;
 
-import com.wubinet.dao.NodeDataRepository;
-import com.wubinet.model.NodeData;
-import com.wubinet.rest.PlotEntry;
-import com.wubinet.rest.PlotEntryKey;
+import com.wubinet.model.Node;
+import com.wubinet.service.ConfigurationService;
+import com.wubinet.service.NodeService;
+import com.wubinet.service.XBeeService;
+import com.wubinet.service.model.NodeConfiguration;
+import com.wubinet.web.form.NodeConfigurationForm;
+import com.wubinet.web.model.PowerLevel;
+import com.wubinet.web.model.SleepMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static java.util.stream.Collectors.joining;
+import javax.validation.Valid;
 
 @Controller
 public class NodeController {
 
-	@Autowired private NodeDataRepository nodeDataRepository;
+	@Autowired private NodeService nodeService;
 
-	/**
-	 *   timestamp  			sht temp  sth %hum  irca temp  irca %co2
-	 *   01/01/2015 12:00:00  	27.0      40%       30.3       10%
-	 *   01/01/2015 12:00:10	27.0      40%       30.3       10%
-	 *
-	 */
-	@RequestMapping(value = "/{nodeAddress}/measures", method = RequestMethod.GET, produces = "application/json")
-	@ResponseBody
-	public String measures(@PathVariable String nodeAddress) {
-		List<PlotEntry> plotEntries = new ArrayList();
-		List<NodeData> nodeDatas = nodeDataRepository.findFirst50ByAddressOrderByTimestampDesc(nodeAddress);
-		nodeDatas.forEach(nodeData -> plotEntries.add(buildPlotEntry(nodeData)));
-		return jsonPlotEntries(plotEntries);
+	@Autowired private XBeeService networkService;
+
+	@Autowired private ConfigurationService configurationService;
+
+	@ModelAttribute
+	public void defaultModel(Model model) {
+		model.addAttribute("menu", "nodes");
 	}
 
-	private String jsonPlotEntries(List<PlotEntry> plotEntries) {
-		return plotEntries.stream().map(entry -> entry.toJson()).collect(joining(",", "[", "]"));
+	@RequestMapping(value = "/nodes", method = RequestMethod.GET)
+	public String nodes(Model model) {
+		model.addAttribute("nodes", nodeService.loadNodes());
+		return "nodes";
 	}
 
-	private PlotEntry buildPlotEntry(NodeData nodeData) {
-		PlotEntry plotEntry = new PlotEntry();
-		plotEntry.setTimestamp(nodeData.getTimestamp());
-		nodeData.getMeasures().forEach(measure -> {
-			measure.getValues().keySet().forEach(measureType -> {
-				PlotEntryKey key = new PlotEntryKey();
-				key.setType(measure.getSensor());
-				key.setMeasureType(measureType);
-				Object value = measure.getMeasureTypeValue(measureType);
-				plotEntry.addSensorMeasure(key, value);
-			});
-		});
-		return plotEntry;
+	@RequestMapping(value = "/node/configuration", method = RequestMethod.GET)
+	public String nodeConfiguration(@RequestParam String address, Model model){
+		NodeConfiguration configuration = configurationService.getNodeConfiguration(address);
+		model.addAttribute("configuration", new NodeConfigurationForm(configuration));
+		model.addAttribute("node", nodeService.loadNode(address));
+		model.addAttribute("sleepModes", SleepMode.values());
+		model.addAttribute("powerLevels", PowerLevel.values());
+		return "node-configuration";
+	}
+
+	@RequestMapping(value = "/node/saveConfiguration", method = RequestMethod.POST)
+	public String saveNodeConfiguration(@Valid NodeConfigurationForm form) {
+		String address = form.getAddress();
+		NodeConfiguration configuration = form.getNodeConfiguration();
+		configurationService.setNodeConfiguration(address, configuration);
+		return "redirect:/nodes";
+	}
+
+	@RequestMapping(value = "/node/nodeChart", method = RequestMethod.GET)
+	public String nodeChart(@RequestParam String address, Model model) {
+		Node node = nodeService.loadNode(address);
+		model.addAttribute("node", node);
+		model.addAttribute("sensorTypeMeasures", node.getSensorTypeMeasures());
+		model.addAttribute("sleepPeriod", networkService.getSleepPeriod());
+		return "node-chart";
 	}
 }

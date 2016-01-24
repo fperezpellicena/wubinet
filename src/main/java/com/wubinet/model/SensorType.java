@@ -2,22 +2,34 @@ package com.wubinet.model;
 
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Getter
 public enum SensorType {
 
-	SHT11('S', 4),
-	IRCA1('I', 6),
-	CO2D1('C', 2),
-	BMP085('B', 4),
-	INTEGRITY_SENSOR('T', 4),
-	MS5540B('M', 14);
+	SHT11('S', 4, MeasureType.TEMPERATURE, MeasureType.HUMIDITY),
+	IRCA1('I', 6, MeasureType.CO2_PERCENTAGE),
+	CO2D1('C', 8, MeasureType.CO2_PERCENTAGE),
+	INTEGRITY_SENSOR('T', 4, MeasureType.TEMPERATURE, MeasureType.HUMIDITY),
+	MS5540B('M', 16, MeasureType.ATMOSPHERIC_PRESSURE, MeasureType.TEMPERATURE);
 
 	private final char id;
 	private final int dataLength;
+	private final List<MeasureType> measureTypes;
 
-	SensorType(char id, int dataLength) {
+
+	SensorType(char id, int dataLength, MeasureType... measureTypes) {
 		this.id = id;
 		this.dataLength = dataLength;
+		this.measureTypes = Arrays.asList(measureTypes);
+	}
+
+	public static NodeSensors nodeSensors(SensorType sensorType) {
+		NodeSensors nodeSensors = new NodeSensors();
+		nodeSensors.setSensorType(sensorType);
+		nodeSensors.setMeasureTypes(sensorType.getMeasureTypes());
+		return nodeSensors;
 	}
 
 	public static SensorType parse(int id) {
@@ -28,8 +40,6 @@ public enum SensorType {
 				return IRCA1;
 			case 'C':
 				return CO2D1;
-			case 'B':
-				return BMP085;
 			case 'M':
 				return MS5540B;
 			case 'T':

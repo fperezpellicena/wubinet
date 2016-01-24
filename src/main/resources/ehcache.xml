@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache updateCheck="false">
+    <diskStore path="java.io.tmpdir"/>
+    <!-- Template for Hibernate caches. Hibernate will create lots of these caches -->
+    <defaultCache eternal="true" maxEntriesLocalHeap="100" diskSpoolBufferSizeMB="10">
+        <persistence strategy="localTempSwap"/>
+    </defaultCache>
+    <!-- Non-eternal caches -->
+    <cache name="node-configuration" eternal="false" maxEntriesLocalHeap="1" diskSpoolBufferSizeMB="10"
+           copyOnRead="true" timeToLiveSeconds="86400"> <!-- 1 day -->
+        <persistence strategy="localTempSwap"/>
+    </cache>
+    <cache name="sleep-period" eternal="false" maxEntriesLocalHeap="1" diskSpoolBufferSizeMB="10"
+           copyOnRead="true" timeToLiveSeconds="86400"> <!-- 1 day -->
+        <persistence strategy="localTempSwap"/>
+    </cache>
+    <cache name="wake-time" eternal="false" maxEntriesLocalHeap="1" diskSpoolBufferSizeMB="10"
+           copyOnRead="true" timeToLiveSeconds="86400"> <!-- 1 day -->
+        <persistence strategy="localTempSwap"/>
+    </cache>
+</ehcache>

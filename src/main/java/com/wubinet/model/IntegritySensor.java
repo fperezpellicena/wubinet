@@ -18,8 +18,8 @@ public class IntegritySensor implements Sensor {
 	}
 
 	@Override
-	public Map<MeasureType, Object> calculate() {
-		Map<MeasureType, Object> values = new HashMap<>();
+	public Map<MeasureType, BigDecimal> calculate() {
+		Map<MeasureType, BigDecimal> values = new HashMap<>();
 		values.put(TEMPERATURE, calculateTemperature());
 		values.put(HUMIDITY, calculateHumidity());
 		return values;

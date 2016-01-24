@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Sensor stats</title>
+    </head>
+    <body>
+        <div th:fragment="stats">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Sensor</th>
+                    <th>Measure</th>
+                    <th>Average</th>
+                    <th>Maximum</th>
+                    <th>Minimum</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="stat : ${stats}">
+                    <td th:text="${stat.sensor.type}">SHT11</td>
+                    <td th:text="${stat.measureType}">temperature</td>
+                    <td th:text="${stat.average}">25ºC</td>
+                    <td th:text="${stat.max}">31ºC</td>
+                    <td th:text="${stat.min}">20ºC</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:fragment="periods">
+            <div class="btn-group btn-group-vertical">
+                <button th:each="period : ${statPeriods}"
+                        th:onclick="|javascript:updateStats('${node.address}', '${period}')|"
+                        th:text="${period}"
+                        type="button" class="btn"></button>
+            </div>
+        </div>
+    </body>
+</html>

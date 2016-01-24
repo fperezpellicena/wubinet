@@ -16,15 +16,26 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class NodeService {
 
+	private static final String NODE_NAME = "Node ";
+
 	@Autowired private NodeRepository nodeRepository;
 	@Autowired private NodeDataRepository nodeDataRepository;
 
 	public List<Node> loadNodes() {
 		List<Node> nodes = nodeRepository.findAll();
 		List<Node> sortedNodes = nodes.stream().
-				sorted(Comparator.comparing(node -> node.getAddress())).
-				collect(toList());
+			sorted(Comparator.comparing(node -> node.getAddress())).
+			collect(toList());
 		return sortedNodes;
+	}
+
+	public String getNodeName(String address) {
+		Node node = loadNode(address);
+		if (node != null) {
+			return node.getName();
+		}
+		long size = nodeRepository.count();
+		return NODE_NAME + size;
 	}
 
 	public Node loadNode(String address) {

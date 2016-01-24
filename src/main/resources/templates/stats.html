@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout">
+    <head lang="en">
+        <meta charset="UTF-8"/>
+        <title>Real time network data</title>
+        <!-- Amchart -->
+        <link rel="stylesheet" th:href="@{/amcharts/style.css}" type="text/css" />
+        <script type="text/javascript" th:src="@{/amcharts/amcharts.js}"></script>
+        <script type="text/javascript" th:src="@{/amcharts/serial.js}"></script>
+        <script type="text/javascript" th:src="@{/js/chart.js}"></script>
+        <script type="text/javascript" th:src="@{/js/stats.js}"></script>
+        <!-- Amchart export options -->
+        <script src="http://amcharts.com/lib/3/plugins/export/export.js" type="text/javascript"></script>
+        <link href="http://amcharts.com/lib/3/plugins/export/export.css" rel="stylesheet" type="text/css" />
+        <script th:if="${node}"
+                th:inline="javascript">
+            $(document).ready(function(){
+                var address = /*[[${node.address}]]*/ "";
+                initialStatsChart(address);
+            });
+        </script>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <h1 th:text="|Node: ${node.address}|">13A200...</h1>
+            <div class="row">
+                <div class="col-md-2">
+                    <div th:include="sensor-stats :: periods(address=${node.address})"></div>
+                </div>
+                <div class="col-md-8">
+                    <div id="integrity_chart" style="width: 100%; height: 400px;"></div>
+                </div>
+                <div class="col-md-2">
+                    <div th:include="sensor-stats :: stats(stats=${integrityStats})"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    <div th:include="sensor-stats :: periods(address=${node.address})"></div>
+                </div>
+                <div class="col-md-8">
+                    <div id="board_chart" style="width: 100%; height: 400px;"></div>
+                </div>
+                <div class="col-md-2">
+                    <div th:include="sensor-stats :: stats(stats=${boardStats})"></div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

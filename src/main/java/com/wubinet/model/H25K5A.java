@@ -4,9 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import static java.lang.Math.exp;
-import static java.math.BigDecimal.ONE;
-import static java.math.BigDecimal.ZERO;
-import static java.math.BigDecimal.valueOf;
+import static java.math.BigDecimal.*;
 
 public class H25K5A {
 
@@ -17,6 +15,7 @@ public class H25K5A {
 	private static final BigDecimal RESISTANCE_REF_KOHM = valueOf(50);
 	private static final BigDecimal UPPER_LIMIT_TEMPERATURE = valueOf(50);
 
+	private final H25K5AFunction mappingFunction = new H25K5AFunction();
 	private final BigDecimal humidity;
 
 	public H25K5A(int humidity) {
@@ -34,12 +33,14 @@ public class H25K5A {
 		return mappingHumidity(temperature, resistance);
 	}
 
-	// TODO
 	private BigDecimal mappingHumidity(BigDecimal temperature, BigDecimal resistance) {
-		return null;
+		int adjTemperature = temperature.intValue();
+		double adjResistance = resistance.setScale(1, RoundingMode.HALF_UP).doubleValue();
+		int humidity = mappingFunction.getRelativeHumidity(adjTemperature, adjResistance);
+		return new BigDecimal(humidity);
 	}
 
 	private boolean temperatureOutOfRange(BigDecimal temperature) {
-		return temperature.compareTo(ZERO) >= 0 && temperature.compareTo(UPPER_LIMIT_TEMPERATURE) <= 0;
+		return temperature.compareTo(ZERO) <= 0 || temperature.compareTo(UPPER_LIMIT_TEMPERATURE) >= 0;
 	}
 }

@@ -1,10 +1,12 @@
 package com.wubinet.parser;
 
-import com.rapplogic.xbee.util.ByteUtils;
 import com.wubinet.model.MeasureType;
 import com.wubinet.model.Ms5540b;
 
+import java.math.BigDecimal;
 import java.util.Map;
+
+import static com.rapplogic.xbee.util.ByteUtils.convertMultiByteToInt;
 
 public class Ms5540bParser implements Parser {
 
@@ -18,12 +20,18 @@ public class Ms5540bParser implements Parser {
 		return new Ms5540bParser(data);
 	}
 
-	public Map<MeasureType, Object> parse() {
-		int[] coefficients = {data[0], data[1], data[2], data[3], data[4], data[5]};
-		int[] pressureBytes = {data[6], data[7]};
-		int pressure = ByteUtils.convertMultiByteToInt(pressureBytes);
-		int[] temperatureBytes = {data[8], data[9]};
-		int temperature = ByteUtils.convertMultiByteToInt(temperatureBytes);
+	public Map<MeasureType, BigDecimal> parse() {
+		int c1 = convertMultiByteToInt(new int[]{data[0], data[1]});
+		int c2 = convertMultiByteToInt(new int[]{data[2], data[3]});
+		int c3 = convertMultiByteToInt(new int[]{data[4], data[5]});
+		int c4 = convertMultiByteToInt(new int[]{data[6], data[7]});
+		int c5 = convertMultiByteToInt(new int[]{data[8], data[9]});
+		int c6 = convertMultiByteToInt(new int[]{data[10], data[11]});
+		int[] coefficients = {c1, c2, c3, c4, c5, c6};
+		int[] pressureBytes = {data[12], data[13]};
+		int pressure = convertMultiByteToInt(pressureBytes);
+		int[] temperatureBytes = {data[14], data[15]};
+		int temperature = convertMultiByteToInt(temperatureBytes);
 		Ms5540b ms5540b = new Ms5540b(coefficients, pressure, temperature);
 		return ms5540b.calculate();
 	}

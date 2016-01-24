@@ -31,7 +31,7 @@ public class PlotEntry {
 	}
 
 	private String jsonTimestamp() {
-		SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss");
+		SimpleDateFormat format = new SimpleDateFormat("dd-MM-YYYY hh:mm:ss");
 		return "\"timestamp\":\"" + format.format(timestamp) + "\",";
 	}
 

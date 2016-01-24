@@ -5,9 +5,10 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
+
+import static java.util.stream.Collectors.toList;
 
 @Setter @Getter @ToString
 public class NodeData {
@@ -23,5 +24,14 @@ public class NodeData {
 
 	public void addMeasure(Measure measure) {
 		measures.add(measure);
+	}
+
+	public List<BigDecimal> extractValues(SensorType sensorType, MeasureType measureType) {
+		List<BigDecimal> values = measures.stream().
+			filter(m -> m.getSensor().equals(sensorType)).
+			map(m -> m.getValues()).
+			map(v -> v.get(measureType)).
+			collect(toList());
+		return values;
 	}
 }

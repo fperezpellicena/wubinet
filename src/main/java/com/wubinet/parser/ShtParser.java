@@ -4,6 +4,7 @@ import com.rapplogic.xbee.util.ByteUtils;
 import com.wubinet.model.MeasureType;
 import com.wubinet.model.Sht;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 public class ShtParser implements Parser {
@@ -18,7 +19,7 @@ public class ShtParser implements Parser {
 		return new ShtParser(data);
 	}
 
-	public Map<MeasureType, Object> parse() {
+	public Map<MeasureType, BigDecimal> parse() {
 		int[] temperatureBytes = {data[0], data[1]};
 		int temperature = ByteUtils.convertMultiByteToInt(temperatureBytes);
 		int[] humidityBytes = {data[2], data[3]};

@@ -10,6 +10,7 @@ import com.wubinet.service.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +48,10 @@ public class XbeePacketProcessor implements Runnable {
 
 	private Node parseNodeData(int[] packet, XBeeAddress64 address) {
 		Node node = new Node();
+		node.setName(nodeService.getNodeName(address.toString()));
 		node.setAddress(address.toString());
 		node.setMobile(parseMobile(packet));
+		node.setSensorTypes(parseSensors(packet));
 		return node;
 	}
 
@@ -69,19 +72,19 @@ public class XbeePacketProcessor implements Runnable {
 		for(SensorType sensorType : parseSensors(packet)) {
 			int to = from + sensorType.getDataLength();
 			int[] sensorData = copyOfRange(packet, from, to);
-			Map<MeasureType, Object> values = parseSensorData(sensorType, sensorData);
+			Map<MeasureType, BigDecimal> values = parseSensorData(sensorType, sensorData);
 			measures.add(buildMeasure(sensorType, values));
 			from = to;
 		}
 		return measures;
 	}
 
-	private Map<MeasureType, Object> parseSensorData(SensorType sensorType, int[] sensorData) {
+	private Map<MeasureType, BigDecimal> parseSensorData(SensorType sensorType, int[] sensorData) {
 		Parser parser = parserFor(sensorType, sensorData);
 		return parser.parse();
 	}
 
-	private Measure buildMeasure(SensorType sensorType, Map<MeasureType, Object> values) {
+	private Measure buildMeasure(SensorType sensorType, Map<MeasureType, BigDecimal> values) {
 		Measure measure = new Measure();
 		measure.setSensor(sensorType);
 		measure.setValues(values);
