@@ -14,4 +14,6 @@ public class NodeConfiguration implements Serializable {
 	private SleepMode sleepMode;
 
 	private PowerLevel powerLevel;
+
+	private String name;
 }

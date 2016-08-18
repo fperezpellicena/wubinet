@@ -27,6 +27,7 @@ public class ConfigurationService {
 	public void setNodeConfiguration(String address, NodeConfiguration configuration) {
 		setSleepMode(address, configuration.getSleepMode());
 		setPowerLevel(address, configuration.getPowerLevel());
+		setName(address, configuration.getName());
 	}
 
 	@Cacheable("sleep-period")
@@ -57,5 +58,10 @@ public class ConfigurationService {
 	private boolean setPowerLevel(String address, PowerLevel level) {
 		XBeeAddress64 remoteAddress = AddressFormatter.format(address);
 		return xBeeService.setPowerLevel(remoteAddress, level);
+	}
+
+	private boolean setName(String address, String name) {
+		XBeeAddress64 remoteAddress = AddressFormatter.format(address);
+		return xBeeService.setName(remoteAddress, name);
 	}
 }

@@ -23,6 +23,7 @@ public class XBeeService {
 	private static final String WAKE_TIME = "ST";
 	private static final String SLEEP_MODE = "SM";
 	private static final String POWER_LEVEL = "PL";
+	private static final String NODE_NAME = "NI";
 
 	@Autowired private XbeePacketListener xbeePacketListener;
 
@@ -61,12 +62,24 @@ public class XBeeService {
 		}
 	}
 
+	public boolean setName(XBeeAddress64 address, String name) {
+		try {
+			RemoteAtRequest atRequest = new RemoteAtRequest(address, NODE_NAME, ByteUtils.stringToIntArray(name));
+			XBeeResponse response = xbee.sendSynchronous(atRequest);
+			return !response.isError();
+		} catch (XBeeException e) {
+			return false;
+		}
+	}
+
 	public NodeConfiguration getNodeConfiguration(XBeeAddress64 address) {
 		int[] sleepMode = getSleepMode(address);
 		int[] powerLevel = getPowerLevel(address);
+		String name = getNodeName(address);
 		NodeConfiguration configuration = new NodeConfiguration();
 		configuration.setSleepMode(SleepMode.parse(sleepMode[0]));
 		configuration.setPowerLevel(PowerLevel.parse(powerLevel[0]));
+		configuration.setName(name);
 		return configuration;
 	}
 
@@ -106,6 +119,20 @@ public class XBeeService {
 			}
 		} catch (XBeeException e) {
 			return new int[1];
+		}
+	}
+
+	public String getNodeName(XBeeAddress64 address) {
+		try {
+			RemoteAtRequest atRequest = new RemoteAtRequest(address, NODE_NAME);
+			RemoteAtResponse response = (RemoteAtResponse) xbee.sendSynchronous(atRequest);
+			if (!response.isError()) {
+				return ByteUtils.toString(response.getValue());
+			} else {
+				return "";
+			}
+		} catch (XBeeException e) {
+			return "";
 		}
 	}
 

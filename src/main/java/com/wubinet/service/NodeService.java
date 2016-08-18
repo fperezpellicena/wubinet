@@ -45,6 +45,8 @@ public class NodeService {
 	@Transactional
 	public void save(Node node, NodeData nodeData) {
 		nodeRepository.save(node);
-		nodeDataRepository.save(nodeData);
+		if (nodeData != null) {
+			nodeDataRepository.save(nodeData);
+		}
 	}
 }

@@ -20,6 +20,8 @@ public class NodeConfigurationForm {
 
 	private PowerLevel powerLevel;
 
+	private String name;
+
 	public NodeConfigurationForm(NodeConfiguration configuration) {
 		sleepMode = configuration.getSleepMode();
 		powerLevel = configuration.getPowerLevel();
@@ -29,6 +31,7 @@ public class NodeConfigurationForm {
 		NodeConfiguration configuration = new NodeConfiguration();
 		configuration.setSleepMode(sleepMode);
 		configuration.setPowerLevel(powerLevel);
+		configuration.setName(name);
 		return configuration;
 	}
 }
